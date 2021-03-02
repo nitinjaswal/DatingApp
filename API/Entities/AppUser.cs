@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using API.Extensions;
 
 namespace API.Entities
@@ -26,12 +27,9 @@ namespace API.Entities
         public string City { get; set; }
         public string Country { get; set; }
 
-         public System.Collections.Generic.ICollection<Photo> Photos {get;set;}
+        public System.Collections.Generic.ICollection<Photo> Photos { get; set; }
 
-        //  public int GetAge()
-        //  {
-        //      return DateOfBirth.CalculateAge();
-        //  }
-
+        public ICollection<UserLike> LikedByUsers { get; set; }// Users who has liked the currently logged-in user.
+        public ICollection<UserLike> LikedUsers { get; set; }// This is the list of Users which currently logged-in user has liked
     }
 }
