@@ -6,7 +6,7 @@ import { environment } from 'src/environments/environment';
 import { User } from '../_models/user';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root' //specifies that Angular should provide the service in the root injector.
 })
 export class AccountService {
   baseUrl = environment.apiUrl;
@@ -17,6 +17,7 @@ export class AccountService {
   constructor(private http: HttpClient) { }
 
   login(model: any) {
+    console.log(model);
     return this.http.post(this.baseUrl + 'account/login', model).pipe(
       map((response: User) => {
         const user = response;
