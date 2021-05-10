@@ -3,6 +3,10 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using API.Data;
+using API.Extensions;
+using API.Entities;
+using Microsoft.AspNetCore.Identity;
 
 namespace API.Extensions
 {
@@ -10,17 +14,35 @@ namespace API.Extensions
     {
         public static IServiceCollection AddIdentityServices(this IServiceCollection services, IConfiguration config)
         {
-                 services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            .AddJwtBearer(options =>
+            services.AddIdentityCore<AppUser>(opt =>
             {
-                options.TokenValidationParameters = new TokenValidationParameters
+                opt.Password.RequireNonAlphanumeric = false;
+            })
+                .AddRoles<AppRole>()
+                .AddRoleManager<RoleManager<AppRole>>()
+                .AddSignInManager<SignInManager<AppUser>>()
+                .AddRoleValidator<RoleValidator<AppRole>>()
+                .AddEntityFrameworkStores<DataContext>();
+
+           
+           services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+               .AddJwtBearer(options =>
                 {
-                    ValidateIssuerSigningKey=true,
-                    IssuerSigningKey= new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["TokenKey"])),
-                    ValidateIssuer=false,
-                    ValidateAudience=false
-                };
+                        options.TokenValidationParameters = new TokenValidationParameters
+                        {
+                            ValidateIssuerSigningKey = true,
+                            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["TokenKey"])),
+                            ValidateIssuer = false,
+                            ValidateAudience = false
+                        };
+                });
+            
+            services.AddAuthorization(opt=>
+            {  
+                opt.AddPolicy("RequireAdminRole", policy => policy.RequireRole("Admin"));
+                opt.AddPolicy("RequireAdminRole", policy => policy.RequireRole("Admin","Moderator"));
             });
+
             return services;
         }
     }
